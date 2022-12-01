@@ -25,6 +25,9 @@ describe("NFTMarketplace", function () {
     const itemPrice = ethers.utils.parseUnits('2', 'ether');
     expect(listingFee).equals("10000000000000000");
 
+    allCollections = await nftMarketplaceContract.getAllNFTCollections();
+    expect(allCollections).to.deep.equal([]);
+
     await nftMarketplaceContract.createNFTCollection("collection 1");
     await nftMarketplaceContract.createNFTCollection("collection 2");
 
@@ -35,6 +38,12 @@ describe("NFTMarketplace", function () {
     collection2 = await nftMarketplaceContract.getNFTCollection(2);
     expect(collection2.name).equals("collection 2");
     expect(collection2.collectionID).equals(2);
+
+    allCollections = await nftMarketplaceContract.getAllNFTCollections();
+    expect(allCollections[0].name).equals("collection 1");
+    expect(allCollections[0].collectionID).equals(1);
+    expect(allCollections[1].name).equals("collection 2");
+    expect(allCollections[1].collectionID).equals(2);
 
     const [owner, seller, buyer] = await ethers.getSigners();
 
@@ -108,7 +117,7 @@ describe("NFTMarketplace", function () {
 
     expect((ownerPostTransactionBalance - ownerInitialBalance).toString()).equals("9999999999934464");
     expect((sellerPostTransactionBalance - sellerInitialBalance).toString()).equals("1999999999999475700");
-    expect((buyerInitialBalance - buyerPostTransactionBalance).toString()).equals("2000175519829590000");
+    expect((buyerInitialBalance - buyerPostTransactionBalance).toString()).equals("2000175627052777500");
     
     var itemsColleciton2 = await nftMarketplaceContract.getNFTItems(2);
 

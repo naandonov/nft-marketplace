@@ -100,13 +100,24 @@ contract NFTMarketplace is ReentrancyGuard {
         emit NFTItemCreated(itemID, nftContractAddress, tokenID, msg.sender, address(0), price, collectionID, false);
     }
 
-    function createNFTCollection(string memory name) public payable nonReentrant {
+    function createNFTCollection(string memory name) public payable nonReentrant returns(uint256) {
         _collectionIDs.increment();
         uint256 id = _collectionIDs.current();
         NFTCollection storage collection = _idToCollectionMapping[id];
         collection.name = name;
         collection.collectionID = id;
         emit NFTCollectionCreated(name, id);
+        return id;
+    }
+
+    function getAllNFTCollections() public view returns(NFTBaseCollection[] memory) {
+         NFTBaseCollection[] memory collections = new NFTBaseCollection[](_collectionIDs.current());
+
+        for (uint256 i = 0; i < _collectionIDs.current(); i++) {
+            NFTCollection storage rawCollection = _idToCollectionMapping[i+1];
+            collections[i] = NFTBaseCollection(rawCollection.name, rawCollection.collectionID);
+        }
+        return collections;
     }
 
     function getNFTCollection(uint256 id) public view returns(NFTBaseCollection memory) {

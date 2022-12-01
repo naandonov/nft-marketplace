@@ -1,31 +1,35 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
 const hre = require("hardhat");
+const ethers = hre.ethers;
 
-async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+async function deployContracts() {
+  await hre.run('compile');
+  const [deployer] = await ethers.getSigners();
 
-  const lockedAmount = hre.ethers.utils.parseEther("1");
+  const deployerAddress = 'Deploying contracts with the account: ' + deployer.address; 
+  await hre.run('print', { message: deployerAddress });
 
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  const accountBallance = 'Account balance: ' + (await deployer.getBalance()).toString();
+  await hre.run('print', { message: accountBallance });
+  
+  const nftMarketplace = await ethers.getContractFactory("NFTMarketplace"); 
+  const nftMarketplaceContract = await nftMarketplace.deploy();
+  await hre.run('print', { message: 'Waiting for NFT Marketplace deployment...' });
 
-  await lock.deployed();
+  await nftMarketplaceContract.deployed();
 
-  console.log(
-    `Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  );
+  const nftMarketplaceContractAddress = 'NFT Marketplace Contract address: ' + nftMarketplaceContract.address;
+  await hre.run('print', { message: nftMarketplaceContractAddress });
+
+  const nft = await ethers.getContractFactory("NFT"); 
+  const nftContract = await nft.deploy(nftMarketplaceContract.address);
+  await hre.run('print', { message: 'Waiting for NFT deployment...' });
+
+  await nftContract.deployed();
+
+  const nftContractAddress = 'NFT Contract address: ' + nftContract.address;
+  await hre.run('print', { message: nftContractAddress });
+
+  await hre.run('print', { message: 'Done!' });
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+module.exports = deployContracts;
