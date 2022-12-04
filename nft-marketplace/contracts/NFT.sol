@@ -65,4 +65,29 @@ contract NFT is ERC721URIStorage {
         }
         return nftItems;
     }
+
+      function getUnlistedNFTItemsRaw() public view returns(string memory) {
+        mapping ( uint256 => uint256) storage items = _addressToNFTItems[msg.sender];
+        Counters.Counter storage itemsCount = _nftsPerOwner[msg.sender];
+        
+        uint256 itemsSize = itemsCount.current();
+        string memory output = "[";
+        for (uint256 i = 0; i < itemsSize; i++) {
+            bool wasListed = false;
+            string memory tokenURI = _indexToURI[items[i + 1]];
+            for(uint256 j = 0; j < _consumedTokensSize.current(); j++) {
+                if (items[i + 1] == consumedTokenIDs[j]) {
+                    wasListed = true;
+                    break;
+                }
+            }
+            string memory itemElement = string(abi.encodePacked("{\"tokenURI\":", "\"", tokenURI, "\"",
+                                                                ",\"wasListed\":", wasListed ? "true" : "false",                                                                                                                                                                                                                                                                                                                              
+                                                                "}"));
+                                                                
+            output = string(abi.encodePacked(output, itemElement, i < itemsSize - 1 ? "," : ""));
+        }
+        output = string(abi.encodePacked(output, "]"));
+        return output;
+    }
 }

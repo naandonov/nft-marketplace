@@ -4,6 +4,7 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "../contracts/NFT.sol";
 
 contract NFTMarketplace is ReentrancyGuard {
@@ -120,6 +121,19 @@ contract NFTMarketplace is ReentrancyGuard {
         return collections;
     }
 
+    function getAllNFTCollectionsRaw() public view returns(string memory) {
+        string memory output = "[";
+        for (uint256 i = 0; i < _collectionIDs.current(); i++) {
+            NFTCollection storage rawCollection = _idToCollectionMapping[i+1];
+            string memory itemElement = string(abi.encodePacked("{\"name\":\"", rawCollection.name,"\""
+                                                                ",\"collectionID\":", Strings.toString(rawCollection.collectionID), 
+                                                                "}"));
+            output = string(abi.encodePacked(output, itemElement, i < _collectionIDs.current() - 1 ? "," : ""));
+        }
+        output = string(abi.encodePacked(output, "]"));
+        return output;
+    }
+
     function getNFTCollection(uint256 id) public view returns(NFTBaseCollection memory) {
         require(id <= _collectionIDs.current(), "Invalid Collection ID");
         NFTCollection storage collection = _idToCollectionMapping[id];
@@ -150,5 +164,29 @@ contract NFTMarketplace is ReentrancyGuard {
             items[i] = _idToNFTItemMapping[collection.nftItemsIndex[i + 1]];
         }
         return items;
+    }
+
+    function getNFTItemsRaw(uint256 collectionID) public view returns(string memory) {
+        require(collectionID <= _collectionIDs.current(), "Invalid Collection ID");
+        NFTCollection storage collection = _idToCollectionMapping[collectionID];
+
+        uint256 items = collection.nftItemsSize.current();
+        string memory output = "[";
+        for (uint256 i = 0; i < items; i++) {
+            NFTItem memory item = _idToNFTItemMapping[collection.nftItemsIndex[i + 1]];
+            string memory itemElement = string(abi.encodePacked("{\"itemID\":", Strings.toString(item.itemID),
+                                                                ",\"nftContractAddress\":", "\"", Strings.toHexString(uint256(uint160(msg.sender)), 20), "\"", 
+                                                                ",\"tokenID\":", Strings.toString(item.tokenID),
+                                                                ",\"seller\":", "\"", Strings.toHexString(uint256(uint160(address(item.seller))), 20), "\"", 
+                                                                ",\"owner\":", "\"", Strings.toHexString(uint256(uint160(address(item.owner))), 20), "\"", 
+                                                                ",\"price\":", Strings.toString(item.price),
+                                                                ",\"collectionID\":", Strings.toString(item.collectionID),  
+                                                                ",\"isSold\":", item.isSold ? "true" : "false",                                                                                                                                                                                                                                                                                                                              
+                                                                "}"));
+                                                                
+            output = string(abi.encodePacked(output, itemElement, i < items - 1 ? "," : ""));
+        }
+        output = string(abi.encodePacked(output, "]"));
+        return output;
     }
 }

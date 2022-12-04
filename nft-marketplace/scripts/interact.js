@@ -12,8 +12,8 @@ if (!infuraGoerliURL) {
   throw new Error("Please set your INFURA_API_KEY in a .env file");
 }
 
-const nftContractAddress = "0x4602e25A5Dfe6C175f08c14F6801039655377aa9";
-const nftMarketplaceContractAddress = "0xF2c5bF61d41fe30a7DE693E0E86174642fF9c9ab";
+const nftContractAddress = "0xC84C09c43442d397B6dec6Ca684928b351833725";
+const nftMarketplaceContractAddress = "0xE29Caee6f089577b405061a16516b36cE1CABdB2";
 
 const run = async function() {
     const provider = new hre.ethers.providers.JsonRpcProvider(infuraGoerliURL)
@@ -21,11 +21,13 @@ const run = async function() {
     const nftContract = new hre.ethers.Contract(nftContractAddress, nft.abi, wallet);
     const nftMarketplaceContract = new hre.ethers.Contract(nftMarketplaceContractAddress, nftMarketplace.abi, wallet)
   
-    // const createCol1Tx = await nftMarketplaceContract.createNFTCollection("Bleak");
+    // const createCol1Tx = await nftMarketplaceContract.createNFTCollection("Beeple");
     // await createCol1Tx.wait();
 
-    // const addCol1 = nftMarketplaceContract.createNFTCollection
     // console.log(await nftMarketplaceContract.getAllNFTCollections())
+    // console.log(await nftContract.getUnlistedNFTItemsRaw())
+    console.log(await nftMarketplaceContract.getNFTItems(1))
+
   }
   
   run()
