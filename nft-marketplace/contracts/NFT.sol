@@ -82,6 +82,7 @@ contract NFT is ERC721URIStorage {
                 }
             }
             string memory itemElement = string(abi.encodePacked("{\"tokenURI\":", "\"", tokenURI, "\"",
+                                                                ",\"tokenID\":", Strings.toString(items[i + 1]),
                                                                 ",\"wasListed\":", wasListed ? "true" : "false",                                                                                                                                                                                                                                                                                                                              
                                                                 "}"));
                                                                 

@@ -91,7 +91,7 @@ describe("NFTMarketplace", function () {
 
     var itemsUnlisted1 = "[]"
     expect(await nftContract.connect(owner).getUnlistedNFTItemsRaw()).equals(itemsUnlisted1);
-    var itemsUnlisted2 = "[{\"tokenURI\":\"wc:token-uri-1\",\"wasListed\":true},{\"tokenURI\":\"wc:token-uri-2\",\"wasListed\":true},{\"tokenURI\":\"wc:token-uri-3\",\"wasListed\":true}]"
+    var itemsUnlisted2 = "[{\"tokenURI\":\"wc:token-uri-1\",\"tokenID\":1,\"wasListed\":true},{\"tokenURI\":\"wc:token-uri-2\",\"tokenID\":2,\"wasListed\":true},{\"tokenURI\":\"wc:token-uri-3\",\"tokenID\":3,\"wasListed\":true}]"
     expect(await nftContract.connect(seller).getUnlistedNFTItemsRaw()).equals(itemsUnlisted2);
     var itemsUnlisted3 = "[]"
     expect(await nftContract.connect(buyer).getUnlistedNFTItemsRaw()).equals(itemsUnlisted3);
@@ -130,10 +130,6 @@ describe("NFTMarketplace", function () {
     const ownerPostTransactionBalance = await owner.getBalance();
     const sellerPostTransactionBalance = await seller.getBalance();
     const buyerPostTransactionBalance = await buyer.getBalance();
-
-    // expect((ownerPostTransactionBalance - ownerInitialBalance).toString()).equals("9999999999934464");
-    // expect((sellerPostTransactionBalance - sellerInitialBalance).toString()).equals("1999999999999475700");
-    // expect((buyerInitialBalance - buyerPostTransactionBalance).toString()).equals("2000176054183919600");
     
     var itemsColleciton2 = await nftMarketplaceContract.getNFTItems(2);
 
